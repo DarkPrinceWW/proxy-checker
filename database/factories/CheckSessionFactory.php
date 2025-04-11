@@ -18,10 +18,11 @@ class CheckSessionFactory extends Factory
      */
     public function definition(): array
     {
+        $createdAt = $this->faker->dateTimeBetween('-5 minutes');
+
         return [
-            'total_proxies' => $this->faker->numberBetween(1, 10),
-            'working_proxies' => 0,
-            'duration' => 0,
+            'created_at' => $createdAt,
+            'finished_at' => $this->faker->dateTimeBetween($createdAt),
         ];
     }
 }

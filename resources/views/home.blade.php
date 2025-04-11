@@ -20,7 +20,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('proxies.check') }}" method="POST">
+            <form action="{{ route('check') }}" method="POST">
                 @csrf
                 <div class="mb-4">
                     <label for="proxies" class="block text-sm font-medium dark:text-[#EDEDEC] mb-2">

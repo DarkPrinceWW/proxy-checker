@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Services\ProxyChecker\DTOs;
+namespace App\Dto;
 
+use App\Enums\ProxyTypeEnum;
 use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 
 #[MapName(SnakeCaseMapper::class)]
-class ProxyCheckerResult extends Data
+class ProxyCheckerData extends Data
 {
     public function __construct(
-        public bool $status,
-        public string $type,
+        public ProxyTypeEnum $type,
         public ?string $country,
         public ?string $city,
         public float $responseTime,

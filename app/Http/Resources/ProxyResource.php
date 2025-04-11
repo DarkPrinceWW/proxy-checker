@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
-use App\Models\ProxyCheck;
+use App\Models\Proxy;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin ProxyCheck
+ * @mixin Proxy
  */
-class ProxyCheckResource extends JsonResource
+class ProxyResource extends JsonResource
 {
-    public function toArray($request): array
+    public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
@@ -25,7 +26,6 @@ class ProxyCheckResource extends JsonResource
             'city' => $this->city,
             'response_time' => $this->response_time,
             'external_ip' => $this->external_ip,
-            'error_count' => $this->error_count,
         ];
     }
 }

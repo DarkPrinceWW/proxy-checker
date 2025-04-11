@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Services\ProxyChecker\Providers;
+namespace App\Services\ProxyChecker;
 
-use App\Services\ProxyChecker\DTOs\ProxyCheckerResult;
+use App\Dto\ProxyCheckerData;
+use App\Enums\ProxyTypeEnum;
 use Illuminate\Http\Client\Response;
 
 class IpApiProxyChecker extends BaseProxyChecker
@@ -16,13 +17,13 @@ class IpApiProxyChecker extends BaseProxyChecker
         return self::API_URL;
     }
 
-    protected function prepareResult(Response $response, string $type, float $duration): ProxyCheckerResult
+    protected function prepareResult(Response $response, ProxyTypeEnum $type): ProxyCheckerData
     {
         $data = $response->json();
+        $duration = $response->handlerStats()['total_time'] * 1000;
 
-        return ProxyCheckerResult::from([
-            'status' => true,
-            'type' => strtoupper($type),
+        return ProxyCheckerData::from([
+            'type' => $type,
             'country' => $data['country'] ?? null,
             'city' => $data['city'] ?? null,
             'response_time' => $duration,

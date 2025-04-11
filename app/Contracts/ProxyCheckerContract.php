@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Contracts;
 
-use App\Services\ProxyChecker\DTOs\ProxyCheckerResult;
+use App\Dto\ProxyCheckerData;
 
 interface ProxyCheckerContract
 {
-    public function check(string $ip, string $port): ProxyCheckerResult|false;
+    /**
+     * Проверяет прокси на работоспособность.
+     */
+    public function check(string $ip, int $port): ?ProxyCheckerData;
 }

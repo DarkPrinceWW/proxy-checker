@@ -13,18 +13,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('proxy_checks', function(Blueprint $table) {
+        Schema::create('proxies', function(Blueprint $table) {
             $table->id();
             $table->foreignId('check_session_id')->constrained();
             $table->string('ip');
-            $table->integer('port');
+            $table->unsignedInteger('port');
             $table->string('type')->nullable();
             $table->string('country')->nullable();
             $table->string('city')->nullable();
-            $table->boolean('status');
-            $table->integer('response_time')->nullable(); // Время ответа в миллисекундах
+            $table->string('status');
+            $table->unsignedInteger('response_time')->nullable()->comment('Время ответа в миллисекундах');
             $table->string('external_ip')->nullable();
-            $table->integer('error_count');
             $table->timestamps();
         });
     }
@@ -34,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('proxy_checks');
+        Schema::dropIfExists('proxies');
     }
 };

@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
-use App\Services\ProxyCheckService;
+use App\Contracts\ProxyCheckerContract;
+use App\Enums\ProxyStatusEnum;
+use App\Models\CheckSession;
+use App\Models\Proxy;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -16,12 +19,30 @@ class CheckProxyJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public function __construct(
-        private readonly string $proxy,
-        private readonly int $checkSessionId,
+        private readonly Proxy $proxy
     ) {}
 
-    public function handle(ProxyCheckService $proxyCheckService): void
+    public function handle(ProxyCheckerContract $proxyChecker): void
     {
-        $proxyCheckService->checkProxy($this->proxy, $this->checkSessionId);
+        $result = $proxyChecker->check($this->proxy->ip, $this->proxy->port);
+
+        if ($result !== null) {
+            $this->proxy->update([
+                'status' => ProxyStatusEnum::Valid,
+                ...$result->all(),
+            ]);
+        } else {
+            $this->proxy->update(['status' => ProxyStatusEnum::Invalid]);
+        }
+
+        $this->updateCheckSession($this->proxy->checkSession);
+    }
+
+    private function updateCheckSession(CheckSession $checkSession): void
+    {
+        // Завершаем сессию, если все проверки завершены
+        if ($checkSession->checked_proxies === $checkSession->total_proxies) {
+            $checkSession->update(['finished_at' => now()]);
+        }
     }
 }

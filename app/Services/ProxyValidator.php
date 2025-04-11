@@ -4,16 +4,30 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Contracts\ProxyValidatorInterface;
+use App\Contracts\ProxyValidatorContract;
+use App\Dto\ProxyValidationData;
 
-class ProxyValidator implements ProxyValidatorInterface
+class ProxyValidator implements ProxyValidatorContract
 {
-    /**
-     * Валидирует формат прокси (ip:port).
-     */
-    public function isValidProxyFormat(string $proxy): bool
+    public function validate(array $proxies): ProxyValidationData
     {
-        // Проверяем, что строка содержит ровно один двоеточие
+        $result = collect($proxies)
+            ->map(fn(string $proxy) => trim($proxy))
+            ->filter()
+            ->map(fn(string $proxy) => [
+                'proxy' => $proxy,
+                'valid' => $this->isValidProxyFormat($proxy),
+            ]);
+
+        return ProxyValidationData::from([
+            'valid' => $result->where('valid', true)->pluck('proxy'),
+            'invalid' => $result->where('valid', false)->pluck('proxy'),
+        ]);
+    }
+
+    private function isValidProxyFormat(string $proxy): bool
+    {
+        // Проверяем, что строка содержит одно двоеточие
         if (substr_count($proxy, ':') !== 1) {
             return false;
         }
@@ -31,33 +45,5 @@ class ProxyValidator implements ProxyValidatorInterface
         }
 
         return true;
-    }
-
-    /**
-     * Парсит и валидирует список прокси.
-     *
-     * @return array{valid: array<string>, invalid: array<string>, total: int}
-     */
-    public function parseAndValidateProxies(string $proxiesInput): array
-    {
-        $proxies = array_filter(array_map('trim', explode("\n", $proxiesInput)));
-        $validProxies = [];
-        $invalidProxies = [];
-        $totalProxies = 0;
-
-        foreach ($proxies as $proxy) {
-            if ($this->isValidProxyFormat($proxy)) {
-                $validProxies[] = $proxy;
-                $totalProxies++;
-            } else {
-                $invalidProxies[] = $proxy;
-            }
-        }
-
-        return [
-            'valid' => $validProxies,
-            'invalid' => $invalidProxies,
-            'total' => $totalProxies,
-        ];
     }
 }

@@ -15,9 +15,7 @@ return new class extends Migration
     {
         Schema::create('check_sessions', function(Blueprint $table) {
             $table->id();
-            $table->integer('total_proxies');
-            $table->integer('working_proxies');
-            $table->integer('duration'); // Время проверки в секундах
+            $table->timestamp('finished_at')->nullable()->comment('Время завершения проверки');
             $table->timestamps();
         });
     }
